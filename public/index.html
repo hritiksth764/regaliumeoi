@@ -313,6 +313,9 @@
     </div>
 
     <script>
+      import fontkit from "fontkit";
+      import { PDFDocument, rgb } from "pdf-lib";
+
       function generateSignature() {
         const name = document.getElementById("signatureName").value;
         const signaturePreview = document.getElementById("signature-preview");
@@ -519,6 +522,8 @@
         const avenirFontBytes = await fetch(
           "/path-to-font/AvenirNext-Regular.ttf"
         ).then((res) => res.arrayBuffer());
+
+        PDFDocument.registerFontkit(fontkit);
 
         // Embed the Avenir font
         const avenirFont = await pdfDoc.embedFont(avenirFontBytes);
