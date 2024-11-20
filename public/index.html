@@ -270,13 +270,19 @@
         );
 
         const tableData = [
-          ["Brand Name", formData.brandName],
+          ["Company Name", formData.brandName],
           ["Legal Entity", formData.legalEntity],
           ["Contact Person", formData.contactPerson],
           ["Contact Details", formData.contactDetails],
-          ["Category of Retail", formData.category],
-          ["Carpet Area (Sq.Ft)", `${formData.carpetArea} Sq.Ft`],
-          ["Specific Requirements", formData.specificRequirements || "N/A"],
+          ["Category of Business", formData.category],
+          [
+            "Approx. carpet area requirement  (Sq.Ft)",
+            `${formData.carpetArea} Sq.Ft`,
+          ],
+          [
+            "Any Specific Requirements or Preferences",
+            formData.specificRequirements || "N/A",
+          ],
         ];
 
         let currentY = 750;
