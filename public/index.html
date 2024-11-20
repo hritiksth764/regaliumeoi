@@ -516,6 +516,12 @@
 
         currentY -= 40;
 
+        const avenirFontBytes = await fetch(
+          "/path-to-font/AvenirNext-Regular.ttf"
+        ).then((res) => res.arrayBuffer());
+
+        // Embed the Avenir font
+        const avenirFont = await pdfDoc.embedFont(avenirFontBytes);
         const disclaimerText =
           "Please note that this EOI is intended solely for planning purposes and does not constitute a binding agreement. " +
           "Upon receiving your EOI, we will provide further details and engage in discussions to finalize the terms and " +
@@ -537,7 +543,7 @@
           x: tableStartX,
           y: currentY,
           size: 12,
-          font,
+          font: avenirFont,
         });
 
         const imageWidth = 250;
