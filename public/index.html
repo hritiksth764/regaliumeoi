@@ -8,9 +8,36 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
       body {
-        font-family: Arial, sans-serif;
         margin: 20px;
-        background-color: #f7f7f7;
+        background: #0c0707;
+      }
+
+      @font-face {
+        font-family: "Avenir Next";
+        src: url("fonts/Avenir Next.ttc") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "Agentur";
+        src: url("fonts/FontsFree-Net-Agentur-Regular.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "Agentur Display";
+        src: url("fonts/FontsFree-Net-Agentur-Display.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "Roboto Mono";
+        src: url("fonts/RobotoMono-VariableFont_wght.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
       }
 
       #form-container {
@@ -44,6 +71,35 @@
       label {
         font-weight: bold;
         margin-bottom: 5px;
+        color: #111;
+        font-family: "Avenir Next";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 140%; /* 19.6px */
+      }
+
+      h1 {
+        color: #fff;
+        text-align: center;
+        font-family: Agentur !important;
+        font-size: 100px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%; /* 150px */
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      p {
+        color: #baaf95;
+        text-align: center;
+        font-family: "Work Sans";
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 140%; /* 44.8px */
+        letter-spacing: 3.2px;
       }
 
       input,
@@ -56,6 +112,12 @@
         border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box; /* Includes padding and border in the width */
+        color: var(--Black-60, rgba(17, 17, 19, 0.6));
+        font-family: "Avenir";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 140%; /* 19.6px */
       }
 
       button {
@@ -66,7 +128,9 @@
         padding: 10px 20px;
         border-radius: 4px;
         margin-top: 10px;
-        align-self: flex-end; /* Align button to the right */
+        align-self: flex-start; /* Align button to the right */
+        border-radius: 2px;
+        background: #111;
       }
 
       button:hover {
@@ -87,8 +151,13 @@
     />
   </head>
   <body>
+    <h1>JOIN US AS REGALIUM</h1>
+    <p>A Realisation of the Future</p>
+    <p>
+      Please go through the Expression of Interest and fill out the below form.
+    </p>
     <div id="form-container">
-      <h1>Expression of Interest</h1>
+      <!-- <h1>JOIN US AS REGALIUM</h1> -->
       <!-- PDF Preview -->
       <iframe
         id="pdf-preview"
