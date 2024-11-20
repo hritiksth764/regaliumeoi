@@ -486,9 +486,9 @@
           });
 
           newPage.drawRectangle({
-            x: tableStartX + colWidths[0],
+            x: tableStartX + colWidth,
             y: currentY - rowHeight,
-            width: colWidths[1],
+            width: colWidth,
             height: rowHeight,
             borderWidth: lineThickness,
             borderColor: PDFLib.rgb(0, 0, 0),
@@ -504,7 +504,7 @@
           });
 
           newPage.drawText(value, {
-            x: tableStartX + colWidths[0] + 5,
+            x: tableStartX + colWidth + 5,
             y: currentY - rowHeight + 8,
             size: 12,
             font,
