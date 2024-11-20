@@ -142,6 +142,21 @@
         margin-top: 10px;
       }
 
+      a {
+        color: #c14535;
+        font-family: "Avenir Next";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 180%;
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+      }
+
       /* Mobile adjustments */
       @media (max-width: 768px) {
         body {
@@ -158,13 +173,58 @@
         }
 
         h1 {
-          font-size: 40px; /* Further reduce heading size for mobile */
+          margin-top: 94px;
+          margin-bottom: 0px;
+          font-size: 28px; /* Further reduce heading size for mobile */
           line-height: 120%;
         }
 
-        p {
-          font-size: 14px; /* Adjust paragraph font size */
-          letter-spacing: 1.5px;
+        .heading-paragraph {
+          color: #baaf95;
+          text-align: center;
+          font-family: "Work Sans";
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 140%;
+          letter-spacing: 3.2px;
+          margin-bottom: 48px; /* Space below the first paragraph */
+        }
+
+        .subtext-paragraph {
+          color: #baaf95;
+          text-align: center;
+          font-family: "Work Sans";
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 140%;
+          letter-spacing: 3.2px;
+        }
+
+        .need-changes {
+          color: black;
+          text-align: center;
+          font-family: "Avenir Next";
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 160%; /* 19.2px */
+        }
+
+        a {
+          color: #c14535;
+          font-family: "Avenir Next";
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 180%;
+          text-decoration-line: underline;
+          text-decoration-style: solid;
+          text-decoration-skip-ink: none;
+          text-decoration-thickness: auto;
+          text-underline-offset: auto;
+          text-underline-position: from-font;
         }
 
         button {
@@ -181,8 +241,8 @@
   </head>
   <body>
     <h1>JOIN US AS REGALIUM</h1>
-    <p>A Realisation of the Future</p>
-    <p>
+    <p class="heading-paragraph">A Realisation of the Future</p>
+    <p class="subtext-paragraph">
       Please go through the Expression of Interest and fill out the below form.
     </p>
     <div id="form-container">
@@ -200,7 +260,7 @@
         "
       >
       </iframe>
-      <p>
+      <p class="need-changes">
         If you cannot view the PDF,
         <a href="/RegaliumLetterheadTemplate.pdf" target="_blank"
           >click here to open or download it</a
