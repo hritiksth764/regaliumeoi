@@ -312,12 +312,7 @@
       </form>
     </div>
 
-    <script type="module">
-      import fontkit from "fontkit";
-      import { PDFDocument, rgb } from "pdf-lib";
-      import axios from "axios"; // Ensure axios is installed in your project
-
-      // Function to generate the signature preview
+    <script>
       function generateSignature() {
         const name = document.getElementById("signatureName").value;
         const signaturePreview = document.getElementById("signature-preview");
@@ -325,7 +320,6 @@
           name.trim() !== "" ? name : "Your signature will appear here...";
       }
 
-      // Form submission handler
       async function handleSubmit(event) {
         event.preventDefault();
 
@@ -361,7 +355,6 @@
         }
       }
 
-      // Function to save data to Google Sheets
       async function saveToGoogleSheets(data) {
         const sheetDBUrl = "https://sheetdb.io/api/v1/ol7be1lpzozf7"; // Replace with your SheetDB API URL
 
@@ -388,54 +381,54 @@
         }
       }
 
-      // Function to generate signed PDF
       async function generateSignedPDF(formData) {
-        // Register fontkit
-        PDFDocument.registerFontkit(fontkit);
+        const signaturePreview = document.getElementById("signature-preview");
+        const scaleFactor = 8;
+        const padding = 20;
 
-        // Load Avenir font
-        const avenirFontBytes = await fetch(
-          "/path-to-font/AvenirNext-Regular.ttf"
-        ).then((res) => res.arrayBuffer());
+        const signatureCanvas = document.createElement("canvas");
+        signatureCanvas.width = signaturePreview.offsetWidth * scaleFactor;
+        signatureCanvas.height =
+          (signaturePreview.offsetHeight + padding * 2) * scaleFactor;
 
-        // Load PDF template
+        const ctx = signatureCanvas.getContext("2d");
+        ctx.scale(scaleFactor, scaleFactor);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+
+        const computedStyle = window.getComputedStyle(signaturePreview);
+        const fontSize = parseFloat(computedStyle.fontSize) || 16;
+        ctx.font = `${fontSize}px ${computedStyle.fontFamily || "Pacifico"}`;
+        ctx.fillStyle = "#000";
+        ctx.textBaseline = "middle";
+
+        const y = signatureCanvas.height / (2 * scaleFactor);
+        const x = 10;
+        ctx.fillText(signaturePreview.textContent, x, y);
+
+        const signatureImage = signatureCanvas.toDataURL("image/png");
+
         const pdfBytes = await fetch("/RegaliumLetterheadTemplate.pdf").then(
           (res) => res.arrayBuffer()
         );
+        const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
 
-        // Load PDF document
-        const pdfDoc = await PDFDocument.load(pdfBytes);
+        // Remove the last page of the PDF
+        const totalPages = pdfDoc.getPageCount();
+        if (totalPages > 0) {
+          pdfDoc.removePage(totalPages - 1);
+        }
 
-        // Embed Avenir font
-        const avenirFont = await pdfDoc.embedFont(avenirFontBytes);
-
-        // Add a new page
         const newPage = pdfDoc.addPage([595, 842]); // A4 size
-        const { width, height } = newPage.getSize();
+        const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-        const tableStartX = 50;
-        let currentY = height - 50;
-
-        // Heading: "YOUR DETAILS"
-        const headingText = "YOUR DETAILS";
-        const headingFontSize = 16;
-        const headingWidth = avenirFont.widthOfTextAtSize(
-          headingText,
-          headingFontSize
+        const signatureImageBytes = await fetch(signatureImage).then((res) =>
+          res.arrayBuffer()
         );
-        const headingX = (width - headingWidth) / 2;
+        const signatureImageEmbedded = await pdfDoc.embedPng(
+          signatureImageBytes
+        );
 
-        newPage.drawText(headingText, {
-          x: headingX,
-          y: currentY,
-          size: headingFontSize,
-          font: avenirFont,
-          color: rgb(0, 0, 0),
-        });
-
-        currentY -= 40;
-
-        // Table Data
         const tableData = [
           ["Company Name", formData.brandName],
           ["Legal Entity", formData.legalEntity],
@@ -443,7 +436,7 @@
           ["Contact Details", formData.contactDetails],
           ["Category of Business", formData.category],
           [
-            "Approx. Carpet Area Requirement (Sq.Ft)",
+            "Approx. carpet area requirement  (Sq.Ft)",
             `${formData.carpetArea} Sq.Ft`,
           ],
           [
@@ -452,9 +445,34 @@
           ],
         ];
 
+        let currentY = 750;
+
+        // Center the "YOUR DETAILS" heading
+        const headingText = "YOUR DETAILS";
+        const headingFontSize = 16;
+        const headingWidth = font.widthOfTextAtSize(
+          headingText,
+          headingFontSize
+        );
+        const headingX = (newPage.getWidth() - headingWidth) / 2;
+
+        newPage.drawText(headingText, {
+          x: headingX,
+          y: currentY + 20,
+          size: headingFontSize,
+          font,
+          color: PDFLib.rgb(0, 0, 0),
+        });
+
+        currentY -= 40;
+
+        const tableStartX = 50;
+        const tableStartY = currentY;
         const rowHeight = 25;
         const colWidths = [200, 300];
         const lineThickness = 0.5;
+
+        currentY = tableStartY;
 
         tableData.forEach(([label, value]) => {
           newPage.drawRectangle({
@@ -463,8 +481,8 @@
             width: colWidths[0],
             height: rowHeight,
             borderWidth: lineThickness,
-            borderColor: rgb(0, 0, 0),
-            color: rgb(1, 1, 1),
+            borderColor: PDFLib.rgb(0, 0, 0),
+            color: PDFLib.rgb(1, 1, 1),
           });
 
           newPage.drawRectangle({
@@ -473,24 +491,24 @@
             width: colWidths[1],
             height: rowHeight,
             borderWidth: lineThickness,
-            borderColor: rgb(0, 0, 0),
-            color: rgb(1, 1, 1),
+            borderColor: PDFLib.rgb(0, 0, 0),
+            color: PDFLib.rgb(1, 1, 1),
           });
 
           newPage.drawText(label, {
             x: tableStartX + 5,
             y: currentY - rowHeight + 8,
-            size: 10,
-            font: avenirFont,
-            color: rgb(0, 0, 0),
+            size: 12,
+            font,
+            color: PDFLib.rgb(0, 0, 0),
           });
 
           newPage.drawText(value, {
             x: tableStartX + colWidths[0] + 5,
             y: currentY - rowHeight + 8,
-            size: 10,
-            font: avenirFont,
-            color: rgb(0, 0, 0),
+            size: 12,
+            font,
+            color: PDFLib.rgb(0, 0, 0),
           });
 
           currentY -= rowHeight;
@@ -498,51 +516,64 @@
 
         currentY -= 40;
 
-        // Generate Signature
-        const signaturePreview = document.getElementById("signature-preview");
-        const signatureCanvas = document.createElement("canvas");
-        signatureCanvas.width = 250;
-        signatureCanvas.height = 50;
+        const disclaimerText =
+          "Please note that this EOI is intended solely for planning purposes and does not constitute a binding agreement. " +
+          "Upon receiving your EOI, we will provide further details and engage in discussions to finalize the terms and " +
+          "conditions of the lease agreement.";
 
-        const ctx = signatureCanvas.getContext("2d");
-        ctx.font = "16px Pacifico, cursive"; // Adjust as needed
-        ctx.fillStyle = "#000";
-        ctx.fillText(signaturePreview.textContent, 10, 30);
+        newPage.drawText(disclaimerText, {
+          x: tableStartX,
+          y: currentY,
+          size: 10,
+          font,
+          color: PDFLib.rgb(0, 0, 0),
+          lineHeight: 12,
+          maxWidth: 495,
+        });
 
-        const signatureImage = signatureCanvas.toDataURL("image/png");
-        const signatureImageBytes = await fetch(signatureImage).then((res) =>
-          res.arrayBuffer()
-        );
+        currentY -= 60;
 
-        const signatureImageEmbedded = await pdfDoc.embedPng(
-          signatureImageBytes
-        );
+        newPage.drawText("Signature:", {
+          x: tableStartX,
+          y: currentY,
+          size: 12,
+          font,
+        });
+
+        const imageWidth = 250;
+        const aspectRatio = signatureCanvas.width / signatureCanvas.height;
+        const imageHeight = imageWidth / aspectRatio;
 
         newPage.drawImage(signatureImageEmbedded, {
           x: tableStartX,
-          y: currentY - 50,
-          width: 250,
-          height: 50,
+          y: currentY - imageHeight - 10,
+          width: imageWidth,
+          height: imageHeight,
         });
 
-        // Save the updated PDF
-        const updatedPdfBytes = await pdfDoc.save();
+        currentY -= imageHeight + 50;
 
-        // Download PDF
+        newPage.drawText("Digitally Verified", {
+          x: tableStartX,
+          y: currentY,
+          size: 12,
+          font,
+        });
+
+        newPage.drawText(`Date: ${new Date().toLocaleDateString()}`, {
+          x: tableStartX,
+          y: currentY - 20,
+          size: 12,
+          font,
+        });
+
+        const updatedPdfBytes = await pdfDoc.save();
         const blob = new Blob([updatedPdfBytes], { type: "application/pdf" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "Signed_EOI.pdf";
         link.click();
       }
-
-      // Add event listeners
-      document
-        .getElementById("eoi-form")
-        .addEventListener("submit", handleSubmit);
-      document
-        .getElementById("signatureName")
-        .addEventListener("input", generateSignature);
     </script>
   </body>
 </html>
