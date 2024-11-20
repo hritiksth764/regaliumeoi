@@ -83,10 +83,10 @@
         color: #fff;
         text-align: center;
         font-family: Agentur !important;
-        font-size: 100px;
+        font-size: 50px; /* Reduced size for mobile */
         font-style: normal;
         font-weight: 400;
-        line-height: 150%; /* 150px */
+        line-height: 120%; /* Adjusted for smaller screens */
         letter-spacing: 2px;
         text-transform: uppercase;
       }
@@ -95,19 +95,17 @@
         color: #baaf95;
         text-align: center;
         font-family: "Work Sans";
-        font-size: 22px;
+        font-size: 16px; /* Smaller font size for readability on mobile */
         font-style: normal;
         font-weight: 400;
-        line-height: 140%; /* 44.8px */
-        letter-spacing: 3.2px;
+        line-height: 140%; /* Adjusted line height */
+        letter-spacing: 2px;
       }
 
       input,
       textarea {
         max-width: 100%; /* Prevent input from exceeding form-container */
-        width: calc(
-          100% - 20px
-        ); /* Adjust width to provide spacing inside container */
+        width: 100%; /* Full width for mobile */
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -128,7 +126,7 @@
         padding: 10px 20px;
         border-radius: 4px;
         margin-top: 10px;
-        align-self: flex-start; /* Align button to the right */
+        align-self: flex-start;
         border-radius: 2px;
         background: #111;
       }
@@ -142,6 +140,37 @@
         font-size: 24px;
         color: #333;
         margin-top: 10px;
+      }
+
+      /* Mobile adjustments */
+      @media (max-width: 768px) {
+        body {
+          margin: 10px; /* Reduce margin for smaller screens */
+        }
+
+        #form-container {
+          padding: 15px; /* Adjust padding */
+          border-radius: 4px;
+        }
+
+        #pdf-preview {
+          height: 300px; /* Reduce height for mobile screens */
+        }
+
+        h1 {
+          font-size: 40px; /* Further reduce heading size for mobile */
+          line-height: 120%;
+        }
+
+        p {
+          font-size: 14px; /* Adjust paragraph font size */
+          letter-spacing: 1.5px;
+        }
+
+        button {
+          width: 100%; /* Full width buttons on mobile */
+          padding: 12px; /* Slightly larger buttons */
+        }
       }
     </style>
     <!-- Google Font for Signature Style -->
