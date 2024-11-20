@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EOI Form with Signed PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f7f7f7;
+      }
+
+      #form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+      }
+
+      #pdf-preview {
+        width: 100%;
+        height: 500px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        overflow: scroll;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* Consistent spacing between fields */
+      }
+
+      form div {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      input,
+      textarea {
+        max-width: 100%; /* Prevent input from exceeding form-container */
+        width: calc(
+          100% - 20px
+        ); /* Adjust width to provide spacing inside container */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Includes padding and border in the width */
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 10px 20px;
+        border-radius: 4px;
+        margin-top: 10px;
+        align-self: flex-end; /* Align button to the right */
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #signature-preview {
+        font-family: "Pacifico", cursive;
+        font-size: 24px;
+        color: #333;
+        margin-top: 10px;
+      }
+    </style>
+    <!-- Google Font for Signature Style -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="form-container">
+      <h1>Expression of Interest</h1>
+      <!-- PDF Preview -->
+      <iframe
+        id="pdf-preview"
+        src="./public/Regalium%20Letterhead%20Template.pdf"
+        type="application/pdf"
+        style="
+          width: 100%;
+          height: 500px;
+          border: 1px solid #ccc;
+          overflow: scroll;
+        "
+      >
+      </iframe>
+      <p>
+        If you cannot view the PDF,
+        <a href="./public/Regalium%20Letterhead%20Template.pdf" target="_blank"
+          >click here to open or download it</a
+        >.
+      </p>
+      <!-- EOI Form -->
+      <form id="eoi-form" onsubmit="handleSubmit(event)">
+        <label for="brandName">Brand Name:</label>
+        <input id="brandName" name="brandName" required />
+
+        <label for="legalEntity">Legal Entity:</label>
+        <input id="legalEntity" name="legalEntity" required />
+
+        <label for="contactPerson">Contact Person:</label>
+        <input id="contactPerson" name="contactPerson" required />
+
+        <label for="contactDetails">Contact Details:</label>
+        <input id="contactDetails" name="contactDetails" required />
+
+        <label for="category">Category of Retail:</label>
+        <input id="category" name="category" required />
+
+        <label for="carpetArea">Approximate Carpet Area (Sq.Ft):</label>
+        <input id="carpetArea" name="carpetArea" required />
+
+        <label for="specificRequirements"
+          >Specific Requirements or Preferences:</label
+        >
+        <textarea
+          id="specificRequirements"
+          name="specificRequirements"
+        ></textarea>
+
+        <label for="signatureName">Name (For Signature):</label>
+        <input
+          id="signatureName"
+          name="signatureName"
+          required
+          oninput="generateSignature()"
+        />
+        <div id="signature-preview">Your signature will appear here...</div>
+
+        <label for="designation">Designation:</label>
+        <input id="designation" name="designation" required />
+
+        <button type="submit">Submit & Download PDF</button>
+      </form>
+    </div>
+
+    <script>
+      function generateSignature() {
+        const name = document.getElementById("signatureName").value;
+        const signaturePreview = document.getElementById("signature-preview");
+        signaturePreview.textContent =
+          name.trim() !== "" ? name : "Your signature will appear here...";
+      }
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+
+        const formData = {
+          brandName: document.getElementById("brandName").value,
+          legalEntity: document.getElementById("legalEntity").value,
+          contactPerson: document.getElementById("contactPerson").value,
+          contactDetails: document.getElementById("contactDetails").value,
+          category: document.getElementById("category").value,
+          carpetArea: document.getElementById("carpetArea").value,
+          specificRequirements: document.getElementById("specificRequirements")
+            .value,
+          designation: document.getElementById("designation").value,
+        };
+
+        try {
+          // Save data to Google Sheets
+          await saveToGoogleSheets(formData);
+
+          alert(
+            "Your data has been successfully saved! Generating your signed EOI..."
+          );
+
+          // Generate the signed PDF
+          await generateSignedPDF(formData);
+
+          // Clear the form fields after successful generation
+          document.getElementById("eoi-form").reset();
+          generateSignature(); // Reset the signature preview
+        } catch (error) {
+          console.error("Error during submission:", error);
+          alert("An error occurred. Please try again.");
+        }
+      }
+
+      async function saveToGoogleSheets(data) {
+        const sheetDBUrl = "https://sheetdb.io/api/v1/ol7be1lpzozf7"; // Replace with your SheetDB API URL
+
+        const formattedData = {
+          data: {
+            "Brand Name": data.brandName,
+            "Legal Entity": data.legalEntity,
+            "Contact Person": data.contactPerson,
+            "Contact Details": data.contactDetails,
+            Category: data.category,
+            "Carpet Area": data.carpetArea,
+            Requirements: data.specificRequirements || "N/A",
+            Designation: data.designation,
+            Timestamp: new Date().toLocaleString(),
+          },
+        };
+
+        try {
+          const response = await axios.post(sheetDBUrl, formattedData);
+          console.log("Data saved successfully:", response.data);
+        } catch (error) {
+          console.error("Error saving data to Google Sheets:", error);
+          throw new Error("Failed to save data to Google Sheets.");
+        }
+      }
+
+      async function generateSignedPDF(formData) {
+        const signaturePreview = document.getElementById("signature-preview");
+        const scaleFactor = 8;
+        const padding = 20;
+
+        const signatureCanvas = document.createElement("canvas");
+        signatureCanvas.width = signaturePreview.offsetWidth * scaleFactor;
+        signatureCanvas.height =
+          (signaturePreview.offsetHeight + padding * 2) * scaleFactor;
+
+        const ctx = signatureCanvas.getContext("2d");
+        ctx.scale(scaleFactor, scaleFactor);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+
+        const computedStyle = window.getComputedStyle(signaturePreview);
+        const fontSize = parseFloat(computedStyle.fontSize) || 16;
+        ctx.font = `${fontSize}px ${computedStyle.fontFamily || "Pacifico"}`;
+        ctx.fillStyle = "#000";
+        ctx.textBaseline = "middle";
+
+        const y = signatureCanvas.height / (2 * scaleFactor);
+        const x = 10;
+        ctx.fillText(signaturePreview.textContent, x, y);
+
+        const signatureImage = signatureCanvas.toDataURL("image/png");
+
+        const pdfBytes = await fetch(
+          "./public/Regalium%20Letterhead%20Template.pdf"
+        ).then((res) => res.arrayBuffer());
+        const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+
+        // Remove the last page of the PDF
+        const totalPages = pdfDoc.getPageCount();
+        if (totalPages > 0) {
+          pdfDoc.removePage(totalPages - 1);
+        }
+
+        const newPage = pdfDoc.addPage([595, 842]); // A4 size
+        const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+        const signatureImageBytes = await fetch(signatureImage).then((res) =>
+          res.arrayBuffer()
+        );
+        const signatureImageEmbedded = await pdfDoc.embedPng(
+          signatureImageBytes
+        );
+
+        const tableData = [
+          ["Brand Name", formData.brandName],
+          ["Legal Entity", formData.legalEntity],
+          ["Contact Person", formData.contactPerson],
+          ["Contact Details", formData.contactDetails],
+          ["Category of Retail", formData.category],
+          ["Carpet Area (Sq.Ft)", `${formData.carpetArea} Sq.Ft`],
+          ["Specific Requirements", formData.specificRequirements || "N/A"],
+        ];
+
+        let currentY = 750;
+
+        // Center the "YOUR DETAILS" heading
+        const headingText = "YOUR DETAILS";
+        const headingFontSize = 16;
+        const headingWidth = font.widthOfTextAtSize(
+          headingText,
+          headingFontSize
+        );
+        const headingX = (newPage.getWidth() - headingWidth) / 2;
+
+        newPage.drawText(headingText, {
+          x: headingX,
+          y: currentY + 20,
+          size: headingFontSize,
+          font,
+          color: PDFLib.rgb(0, 0, 0),
+        });
+
+        currentY -= 40;
+
+        const tableStartX = 50;
+        const tableStartY = currentY;
+        const rowHeight = 25;
+        const colWidths = [200, 300];
+        const lineThickness = 0.5;
+
+        currentY = tableStartY;
+
+        tableData.forEach(([label, value]) => {
+          newPage.drawRectangle({
+            x: tableStartX,
+            y: currentY - rowHeight,
+            width: colWidths[0],
+            height: rowHeight,
+            borderWidth: lineThickness,
+            borderColor: PDFLib.rgb(0, 0, 0),
+            color: PDFLib.rgb(1, 1, 1),
+          });
+
+          newPage.drawRectangle({
+            x: tableStartX + colWidths[0],
+            y: currentY - rowHeight,
+            width: colWidths[1],
+            height: rowHeight,
+            borderWidth: lineThickness,
+            borderColor: PDFLib.rgb(0, 0, 0),
+            color: PDFLib.rgb(1, 1, 1),
+          });
+
+          newPage.drawText(label, {
+            x: tableStartX + 5,
+            y: currentY - rowHeight + 8,
+            size: 12,
+            font,
+            color: PDFLib.rgb(0, 0, 0),
+          });
+
+          newPage.drawText(value, {
+            x: tableStartX + colWidths[0] + 5,
+            y: currentY - rowHeight + 8,
+            size: 12,
+            font,
+            color: PDFLib.rgb(0, 0, 0),
+          });
+
+          currentY -= rowHeight;
+        });
+
+        currentY -= 40;
+
+        const disclaimerText =
+          "Please note that this EOI is intended solely for planning purposes and does not constitute a binding agreement. " +
+          "Upon receiving your EOI, we will provide further details and engage in discussions to finalize the terms and " +
+          "conditions of the lease agreement.";
+
+        newPage.drawText(disclaimerText, {
+          x: tableStartX,
+          y: currentY,
+          size: 10,
+          font,
+          color: PDFLib.rgb(0, 0, 0),
+          lineHeight: 12,
+          maxWidth: 495,
+        });
+
+        currentY -= 60;
+
+        newPage.drawText("Signature:", {
+          x: tableStartX,
+          y: currentY,
+          size: 12,
+          font,
+        });
+
+        const imageWidth = 250;
+        const aspectRatio = signatureCanvas.width / signatureCanvas.height;
+        const imageHeight = imageWidth / aspectRatio;
+
+        newPage.drawImage(signatureImageEmbedded, {
+          x: tableStartX,
+          y: currentY - imageHeight - 10,
+          width: imageWidth,
+          height: imageHeight,
+        });
+
+        currentY -= imageHeight + 50;
+
+        newPage.drawText("Digitally Verified", {
+          x: tableStartX,
+          y: currentY,
+          size: 12,
+          font,
+        });
+
+        newPage.drawText(`Date: ${new Date().toLocaleDateString()}`, {
+          x: tableStartX,
+          y: currentY - 20,
+          size: 12,
+          font,
+        });
+
+        const updatedPdfBytes = await pdfDoc.save();
+        const blob = new Blob([updatedPdfBytes], { type: "application/pdf" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "Signed_EOI.pdf";
+        link.click();
+      }
+    </script>
+  </body>
+</html>
