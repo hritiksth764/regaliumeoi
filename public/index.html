@@ -475,8 +475,9 @@
         currentY = tableStartY;
 
         tableData.forEach(([label, value]) => {
+          // Left column cell
           newPage.drawRectangle({
-            x: tableStartX,
+            x: tableStartX, // Starting position for the left column
             y: currentY - rowHeight,
             width: colWidth,
             height: rowHeight,
@@ -485,8 +486,9 @@
             color: PDFLib.rgb(1, 1, 1),
           });
 
+          // Right column cell
           newPage.drawRectangle({
-            x: tableStartX + colWidth,
+            x: tableStartX + colWidth, // Start position for the right column
             y: currentY - rowHeight,
             width: colWidth,
             height: rowHeight,
@@ -495,16 +497,18 @@
             color: PDFLib.rgb(1, 1, 1),
           });
 
+          // Draw text for the left column
           newPage.drawText(label, {
-            x: tableStartX + 5,
+            x: tableStartX + 5, // Padding inside the left column
             y: currentY - rowHeight + 8,
             size: 12,
             font,
             color: PDFLib.rgb(0, 0, 0),
           });
 
+          // Draw text for the right column
           newPage.drawText(value, {
-            x: tableStartX + colWidth + 5,
+            x: tableStartX + colWidth + 5, // Padding inside the right column
             y: currentY - rowHeight + 8,
             size: 12,
             font,
@@ -513,7 +517,6 @@
 
           currentY -= rowHeight;
         });
-
         currentY -= 40;
 
         const disclaimerText =
