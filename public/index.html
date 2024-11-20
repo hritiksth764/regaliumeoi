@@ -466,14 +466,22 @@
 
         currentY -= 40;
 
-        const tableStartX = 50;
+        // const tableStartX = 50;
         const tableStartY = currentY;
         const rowHeight = 25;
-        const colWidth = 275;
         const lineThickness = 0.5;
 
         currentY = tableStartY;
 
+        // Set equal column widths and adjust table layout
+        const tableWidth = 500; // Total width of the table
+        const colWidth = tableWidth / 2; // Equal width for both columns
+
+        // Adjust the starting X position for the table to center it on the page
+        const pageWidth = newPage.getWidth();
+        const tableStartX = (pageWidth - tableWidth) / 2; // Center the table horizontally
+
+        // Draw the table rows
         tableData.forEach(([label, value]) => {
           // Left column cell
           newPage.drawRectangle({
@@ -504,6 +512,7 @@
             size: 12,
             font,
             color: PDFLib.rgb(0, 0, 0),
+            maxWidth: colWidth - 10, // Ensure text doesn't overflow
           });
 
           // Draw text for the right column
@@ -513,6 +522,7 @@
             size: 12,
             font,
             color: PDFLib.rgb(0, 0, 0),
+            maxWidth: colWidth - 10, // Ensure text doesn't overflow
           });
 
           currentY -= rowHeight;
