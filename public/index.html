@@ -92,7 +92,7 @@
       <!-- PDF Preview -->
       <iframe
         id="pdf-preview"
-        src="/Regalium%20Letterhead%20Template.pdf"
+        src="/RegaliumLetterheadTemplate.pdf"
         type="application/pdf"
         style="
           width: 100%;
@@ -104,7 +104,7 @@
       </iframe>
       <p>
         If you cannot view the PDF,
-        <a href="/Regalium%20Letterhead%20Template.pdf" target="_blank"
+        <a href="/RegaliumLetterheadTemplate.pdf" target="_blank"
           >click here to open or download it</a
         >
       </p>
@@ -248,9 +248,9 @@
 
         const signatureImage = signatureCanvas.toDataURL("image/png");
 
-        const pdfBytes = await fetch(
-          "./public/Regalium%20Letterhead%20Template.pdf"
-        ).then((res) => res.arrayBuffer());
+        const pdfBytes = await fetch("/RegaliumLetterheadTemplate.pdf").then(
+          (res) => res.arrayBuffer()
+        );
         const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
 
         // Remove the last page of the PDF
