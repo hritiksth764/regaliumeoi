@@ -315,8 +315,17 @@
     <script type="module">
       import fontkit from "fontkit";
       import { PDFDocument, rgb } from "pdf-lib";
-      import axios from "axios"; // Make sure axios is included in your project
+      import axios from "axios"; // Ensure axios is installed in your project
 
+      // Function to generate the signature preview
+      function generateSignature() {
+        const name = document.getElementById("signatureName").value;
+        const signaturePreview = document.getElementById("signature-preview");
+        signaturePreview.textContent =
+          name.trim() !== "" ? name : "Your signature will appear here...";
+      }
+
+      // Form submission handler
       async function handleSubmit(event) {
         event.preventDefault();
 
@@ -345,12 +354,14 @@
 
           // Clear the form fields after successful generation
           document.getElementById("eoi-form").reset();
+          generateSignature(); // Reset the signature preview
         } catch (error) {
           console.error("Error during submission:", error);
           alert("An error occurred. Please try again.");
         }
       }
 
+      // Function to save data to Google Sheets
       async function saveToGoogleSheets(data) {
         const sheetDBUrl = "https://sheetdb.io/api/v1/ol7be1lpzozf7"; // Replace with your SheetDB API URL
 
@@ -377,6 +388,7 @@
         }
       }
 
+      // Function to generate signed PDF
       async function generateSignedPDF(formData) {
         // Register fontkit
         PDFDocument.registerFontkit(fontkit);
@@ -486,20 +498,31 @@
 
         currentY -= 40;
 
-        // Disclaimer Text
-        const disclaimerText =
-          "Please note that this EOI is intended solely for planning purposes and does not constitute a binding agreement. " +
-          "Upon receiving your EOI, we will provide further details and engage in discussions to finalize the terms and " +
-          "conditions of the lease agreement.";
+        // Generate Signature
+        const signaturePreview = document.getElementById("signature-preview");
+        const signatureCanvas = document.createElement("canvas");
+        signatureCanvas.width = 250;
+        signatureCanvas.height = 50;
 
-        newPage.drawText(disclaimerText, {
+        const ctx = signatureCanvas.getContext("2d");
+        ctx.font = "16px Pacifico, cursive"; // Adjust as needed
+        ctx.fillStyle = "#000";
+        ctx.fillText(signaturePreview.textContent, 10, 30);
+
+        const signatureImage = signatureCanvas.toDataURL("image/png");
+        const signatureImageBytes = await fetch(signatureImage).then((res) =>
+          res.arrayBuffer()
+        );
+
+        const signatureImageEmbedded = await pdfDoc.embedPng(
+          signatureImageBytes
+        );
+
+        newPage.drawImage(signatureImageEmbedded, {
           x: tableStartX,
-          y: currentY,
-          size: 10,
-          font: avenirFont,
-          color: rgb(0, 0, 0),
-          lineHeight: 12,
-          maxWidth: width - 2 * tableStartX,
+          y: currentY - 50,
+          width: 250,
+          height: 50,
         });
 
         // Save the updated PDF
@@ -513,9 +536,13 @@
         link.click();
       }
 
+      // Add event listeners
       document
         .getElementById("eoi-form")
         .addEventListener("submit", handleSubmit);
+      document
+        .getElementById("signatureName")
+        .addEventListener("input", generateSignature);
     </script>
   </body>
 </html>
