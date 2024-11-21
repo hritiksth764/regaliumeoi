@@ -119,6 +119,7 @@
       }
 
       button {
+        width: 200px;
         background-color: #007bff;
         color: white;
         border: none;
@@ -126,7 +127,7 @@
         padding: 10px 20px;
         border-radius: 4px;
         margin-top: 10px;
-        align-self: flex-start;
+        align-self: center;
         border-radius: 2px;
         background: #111;
       }
@@ -155,6 +156,18 @@
         text-decoration-thickness: auto;
         text-underline-offset: auto;
         text-underline-position: from-font;
+      }
+
+      .Disclaimer {
+        align-self: stretch;
+        color: #414141;
+        text-align: left;
+        font-family: "Avenir Next";
+        font-size: 10px;
+        font-style: italic;
+        font-weight: 200;
+        line-height: 140%; /* 14px */
+        opacity: 0.8;
       }
 
       /* Mobile adjustments */
@@ -227,9 +240,23 @@
           text-underline-position: from-font;
         }
 
+        .Disclaimer {
+          align-self: stretch;
+          color: #414141;
+          text-align: left;
+          font-family: "Avenir Next";
+          font-size: 8px;
+          font-style: italic;
+          font-weight: 200;
+          line-height: 140%; /* 14px */
+          opacity: 0.8;
+        }
+
         button {
           width: 100%; /* Full width buttons on mobile */
           padding: 12px; /* Slightly larger buttons */
+          align-self: center;
+          margin-bottom: 20px;
         }
       }
     </style>
@@ -283,9 +310,7 @@
         <label for="category">Category of Business:</label>
         <input id="category" name="category" required />
 
-        <label for="carpetArea"
-          >Approximate Carpet Area Requirement in (Sq.Ft):</label
-        >
+        <label for="carpetArea">Approximate Area Requirement in (Sq.Ft):</label>
         <input id="carpetArea" name="carpetArea" required />
 
         <label for="specificRequirements"
@@ -307,6 +332,13 @@
 
         <label for="designation">Designation:</label>
         <input id="designation" name="designation" required />
+
+        <p class="Disclaimer">
+          *Please note that this EOI is intended solely for planning purposes
+          and does not constitute a binding agreement. Upon receiving your EOI,
+          we will provide further details and engage in discussions to finalize
+          the terms and conditions of the lease agreement.
+        </p>
 
         <button type="submit">Submit & Download PDF</button>
       </form>
